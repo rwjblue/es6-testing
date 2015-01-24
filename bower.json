@@ -1,0 +1,19 @@
+{
+  "name": "loader-issue",
+  "version": "0.0.0",
+  "authors": [
+    "Robert Jackson <robert.w.jackson@me.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "loader.js": "ember-cli/loader.js#~3.0.0"
+  }
+}
