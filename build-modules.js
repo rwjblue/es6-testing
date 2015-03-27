@@ -6,6 +6,8 @@ var walkSync = require('walk-sync');
 var SourceMap = require('fast-sourcemap-concat');
 var rimraf = require('rimraf');
 var babel = require('babel');
+var usedHelpers = [];
+
 
 var s = new SourceMap({
   outputFile: 'dist/modules.js'
@@ -19,9 +21,14 @@ walkSync('modules')
     var moduleName = file.slice(0, -3);
     var content = fs.readFileSync('modules/' + file, { encoding: 'utf8' });
  
-    content = babel.transform(content).code;
+    var babelOutput = babel.transform(content, {
+      externalHelpers: true,
+      returnUsedHelpers: true
+    });
 
-    var code = esperanto.toAmd(content, {
+    usedHelpers = usedHelpers.concat(babelOutput.usedHelpers);
+
+    var code = esperanto.toAmd(babelOutput.code, {
       sourceMap: 'inline',
       sourceMapSource: file,
       sourceMapFile: 'dest.js.map',
@@ -34,6 +41,10 @@ walkSync('modules')
     s.addFileSource(file, code);
     s.addSpace("\n");
   });
+
+// write the helpers to the file
+s.addFileSource('babelHelpers.js', babel.buildExternalHelpers(usedHelpers));
+s.addSpace("\n");
 
 s.end()
 
