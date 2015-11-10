@@ -9,8 +9,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "babel": "^4.7.16",
-    "esperanto": "^0.6.7",
+    "babel": "^5.0.7",
     "fast-sourcemap-concat": "^0.2.1",
     "magic-string": "^0.4.2",
     "rimraf": "^2.2.8",

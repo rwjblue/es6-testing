@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 var fs = require('fs');
-var esperanto = require('esperanto');
 var walkSync = require('walk-sync');
 var SourceMap = require('fast-sourcemap-concat');
 var rimraf = require('rimraf');
@@ -22,41 +21,27 @@ walkSync('modules')
     var content = fs.readFileSync('modules/' + file, { encoding: 'utf8' });
  
     var babelOutput = babel.transform(content, {
+      filename: file,
+      loose: true,
+      moduleId: true,
+      modules: 'amdStrict',
       externalHelpers: true,
-      returnUsedHelpers: true
+      metadataUsedHelpers: true,
+      optional: ["es7.decorators"]
     });
 
-    usedHelpers = usedHelpers.concat(babelOutput.usedHelpers);
+    usedHelpers = usedHelpers.concat(babelOutput.metadata.usedHelpers);
 
-    var code = esperanto.toAmd(babelOutput.code, {
-      sourceMap: 'inline',
-      sourceMapSource: file,
-      sourceMapFile: 'dest.js.map',
-      amdName: moduleName,
-      strict: true,
-      absolutePaths: true
-    }).code
+    var code = babelOutput.code;
 
     fs.writeFileSync('tmp-file.js', code, { encoding: 'utf8' });
-    s.addFileSource(file, code);
+    s.addFileSource(file, babelOutput.code);
     s.addSpace("\n");
   });
 
+console.log('Helpers: ' + usedHelpers.join(', '));
 // write the helpers to the file
 s.addFileSource('babelHelpers.js', babel.buildExternalHelpers(usedHelpers));
 s.addSpace("\n");
 
 s.end()
-
-esperanto.bundle({
-  base: 'modules', // optional, defaults to current dir
-  entry: 'main.js' // the '.js' is optional
-}).then( function ( bundle ) {
-  var amd = bundle.toUmd({
-    name: 'UmdTest',
-    strict: true,
-    absolutePaths: true,
-    sourceMap: true,
-    sourceMapFile: 'bundle.js'
-  });
-});
