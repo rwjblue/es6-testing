@@ -7,7 +7,6 @@ var rimraf = require('rimraf');
 var babel = require('babel');
 var usedHelpers = [];
 
-
 var s = new SourceMap({
   outputFile: 'dist/modules.js'
 });
@@ -19,7 +18,7 @@ walkSync('modules')
   .forEach(function(file) {
     var moduleName = file.slice(0, -3);
     var content = fs.readFileSync('modules/' + file, { encoding: 'utf8' });
- 
+
     var babelOutput = babel.transform(content, {
       filename: file,
       loose: true,
@@ -44,4 +43,4 @@ console.log('Helpers: ' + usedHelpers.join(', '));
 s.addFileSource('babelHelpers.js', babel.buildExternalHelpers(usedHelpers));
 s.addSpace("\n");
 
-s.end()
+s.end();
